@@ -2,6 +2,7 @@ package framework
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"sync"
 )
@@ -54,4 +55,21 @@ func (ctx *Context) SetHasTimeout() {
 
 func (ctx *Context) HasTimeout() bool {
 	return ctx.hasTimeout
+}
+func (ctx *Context) Json(status int, obj interface{}) error {
+	if ctx.HasTimeout() {
+		return nil
+	}
+	ctx.responseWriter.Header().Set("Content-Type", "application/json")
+	ctx.responseWriter.WriteHeader(status)
+	byt, err := json.Marshal(obj)
+	if err != nil {
+		ctx.responseWriter.WriteHeader(500)
+		return err
+	}
+	_, err = ctx.responseWriter.Write(byt)
+	if err != nil {
+		return err
+	}
+	return nil
 }
