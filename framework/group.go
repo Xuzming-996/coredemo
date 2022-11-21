@@ -14,9 +14,10 @@ type IGroup interface {
 
 // Group struct 实现了IGroup
 type Group struct {
-	core   *Core  // 指向core结构
-	parent *Group //指向上一个Group，如果有的话
-	prefix string // 这个group的通用前缀
+	core        *Core  // 指向core结构
+	parent      *Group //指向上一个Group，如果有的话
+	prefix      string // 这个group的通用前缀
+	middlewares []ControllerHandler
 }
 
 // 初始化Group
@@ -26,6 +27,11 @@ func NewGroup(core *Core, prefix string) *Group {
 		parent: nil,
 		prefix: prefix,
 	}
+}
+
+// 注册中间件
+func (g *Group) Use(middlewares ...ControllerHandler) {
+	g.middlewares = append(g.middlewares, middlewares...)
 }
 
 // 实现Get方法
